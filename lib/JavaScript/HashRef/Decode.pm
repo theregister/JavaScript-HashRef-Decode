@@ -15,8 +15,8 @@ number:     /[0-9]+(\.[0-9]+)?/
         value => $item[1],
     }, 'JavaScript::HashRef::Decode::NUMBER';
 }
-string:
-    m{"             # Starts with a double-quote
+string_double_quoted:
+    m{"             # Starts with a single-quote
       (               # Start capturing *inside* the double-quote
         (
             \\.           # An escaped-something
@@ -26,6 +26,23 @@ string:
 
       )               # End capturing *inside* the double-quote
     "               # Ends with a double-quote
+    }x
+{
+    $return = bless {
+        value => "$1",
+    }, 'JavaScript::HashRef::Decode::STRING';
+}
+string_single_quoted:
+    m{'             # Starts with a single-quote
+      (               # Start capturing *inside* the single-quote
+        (
+            \\.           # An escaped-something
+            |             # .. or
+            [^']          # Anything that's not a single-quote
+        )*              # 0+ combination of the previous
+
+      )               # End capturing *inside* the single-quote
+    '               # Ends with a single-quote
     }x
 {
     $return = bless {
@@ -43,6 +60,7 @@ undefined: "undefined"
     $return = bless {
     }, 'JavaScript::HashRef::Decode::UNDEFINED';
 }
+string: string_single_quoted | string_double_quoted
 any_value:  number | string | hashref | arrayref | undefined
 key_value:  key ":" any_value
 {

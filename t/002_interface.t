@@ -21,6 +21,14 @@ is((sort keys %$res)[ 1 ], 'y');
 is($res->{k},              'v');
 is($res->{y},              undef);
 
+$str = "{k:'v',y:undefined}";
+$res = decode_js($str);
+is(ref $res, 'HASH', 'simple hashref');
+is((sort keys %$res)[ 0 ], 'k');
+is((sort keys %$res)[ 1 ], 'y');
+is($res->{k},              'v');
+is($res->{y},              undef);
+
 $str = '{k:[1,undefined,3],y:{k:"v",y:123}}';
 $res = decode_js($str);
 is(ref $res, 'HASH', 'complex hashref');

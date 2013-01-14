@@ -25,6 +25,11 @@ $res = $parser->string($str);
 $res = $res->out;
 is($res, 'foo', 'Simple string');
 
+$str = "'foo'";
+$res = $parser->string($str);
+$res = $res->out;
+is($res, 'foo', 'Simple string');
+
 $str = q!"f\"oo"!;
 $res = $parser->string($str);
 $res = $res->out;
@@ -72,7 +77,26 @@ is($res->[ 0 ], 1);
 is($res->[ 1 ], "foo");
 is($res->[ 2 ], 3);
 
+$str = "[1,'foo',3]";
+$res = $parser->arrayref($str);
+$res = $res->out;
+is($res->[ 0 ], 1);
+is($res->[ 1 ], "foo");
+is($res->[ 2 ], 3);
+
 $str = '[1,{foo:"bar",bar:6.66},3]';
+$res = $parser->arrayref($str);
+$res = $res->out;
+is(ref $res, 'ARRAY', 'complex arrayref');
+is($res->[ 0 ],     1);
+is(ref $res->[ 1 ], 'HASH');
+ok(exists $res->[ 1 ]{foo});
+ok(exists $res->[ 1 ]{bar});
+is($res->[ 1 ]{foo}, 'bar');
+is($res->[ 1 ]{bar}, 6.66);
+is($res->[ 2 ],      3);
+
+$str = "[1,{foo:'bar',bar:6.66},3]";
 $res = $parser->arrayref($str);
 $res = $res->out;
 is(ref $res, 'ARRAY', 'complex arrayref');
