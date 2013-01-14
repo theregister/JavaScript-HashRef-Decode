@@ -1,3 +1,9 @@
+v.130142 - 2013-01-14
+    Add support for true, false, null
+    hashref keys can be single- and double- quoted strings
+    Renamed key_value to tuple
+    Added description
+
 v.130141 - 2013-01-14
     Fixed POD
 
