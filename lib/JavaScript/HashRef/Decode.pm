@@ -38,7 +38,12 @@ key:        m{[a-zA-Z_][a-zA-Z_0-9]*}
         key => $item[1],
     }, 'JavaScript::HashRef::Decode::KEY';
 }
-any_value:  number | string | hashref | arrayref
+undefined: "undefined"
+{
+    $return = bless {
+    }, 'JavaScript::HashRef::Decode::UNDEFINED';
+}
+any_value:  number | string | hashref | arrayref | undefined
 key_value:  key ":" any_value
 {
     $return = bless {
@@ -115,6 +120,12 @@ sub out {
     $val =~ s/\\n/\n/g;
     $val =~ s/\\t/\t/g;
     return $val;
+}
+
+package JavaScript::HashRef::Decode::UNDEFINED;
+
+sub out {
+    return undef;
 }
 
 package JavaScript::HashRef::Decode::ARRAYREF;
