@@ -83,6 +83,20 @@ END_GRAMMAR
 
 our $parser;
 
+=head2 SYNOPSIS
+
+    use JavaScript::HashRef::Decode qw<decode_js>;
+    use Data::Dumper::Concise;
+    my $js   = q!{ foo: "bar", baz: { quux: 123 } }!;
+    my $href = decode_js($js);
+    print Dumper $href;
+    {
+        baz => {
+            quux => 123
+        },
+        foo => "bar"
+    }
+
 =head2 C<decode_js($str)>
 
 Given a JavaScript object thing (i.e. an hashref), returns a Perl hashref
