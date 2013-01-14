@@ -12,17 +12,17 @@ Examples
 --------
 
 
-  use JavaScript::HashRef::Decode qw<decode_js>;
-  use Data::Dumper::Concise;
-  my $js   = q!{ foo: "bar", baz: { quux: 123 } }!;
-  my $href = decode_js($js);
-  print Dumper $href;
-  {
-      baz => {
-          quux => 123
-      },
-      foo => "bar"
-  }
+    use JavaScript::HashRef::Decode qw<decode_js>;
+    use Data::Dumper::Concise;
+    my $js   = q!{ foo: "bar", baz: { quux: 123 } }!;
+    my $href = decode_js($js);
+    print Dumper $href;
+    {
+        baz => {
+            quux => 123
+        },
+        foo => "bar"
+    }
 
 
 To do
