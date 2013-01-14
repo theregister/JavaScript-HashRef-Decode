@@ -20,10 +20,40 @@ $res = $parser->undefined($str);
 $res = $res->out;
 is($res, undef, 'Simple undefined');
 
+$str = 'true';
+$res = $parser->true($str);
+$res = $res->out;
+is($res, !0, 'Simple true');
+
+$str = 'false';
+$res = $parser->false($str);
+$res = $res->out;
+is($res, !1, 'Simple false');
+
 $str = '"foo"';
 $res = $parser->string($str);
 $res = $res->out;
 is($res, 'foo', 'Simple string');
+
+$str = 'foo';
+$res = $parser->key($str);
+$res = $res->out;
+is($res, 'foo', 'Simple key');
+
+$str = '"foo"';
+$res = $parser->key($str);
+$res = $res->out;
+is($res, 'foo', 'Simple key');
+
+$str = '"fo\"o"';
+$res = $parser->key($str);
+$res = $res->out;
+is($res, 'fo"o', 'Escaped key');
+
+$str = "'foo'";
+$res = $parser->key($str);
+$res = $res->out;
+is($res, 'foo', 'Simple key');
 
 $str = "'foo'";
 $res = $parser->string($str);
@@ -123,7 +153,7 @@ is((sort keys %$res)[ 1 ], 'y');
 is($res->{k},              'v');
 is($res->{y},              undef);
 
-$str = '{k:[1,undefined,3],y:{k:"v",y:123}}';
+$str = '{k:[1,undefined,3],y:{k:"v",y:false}}';
 $res = $parser->hashref($str);
 $res = $res->out;
 is(ref $res, 'HASH', 'complex hashref');
@@ -137,4 +167,4 @@ is(ref $res->{y},          'HASH');
 ok(exists $res->{y}{k});
 ok(exists $res->{y}{y});
 is($res->{y}{k}, 'v');
-is($res->{y}{y}, 123);
+is($res->{y}{y}, !(1==1));
