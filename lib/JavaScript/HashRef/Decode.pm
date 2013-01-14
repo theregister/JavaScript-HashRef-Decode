@@ -83,7 +83,11 @@ END_GRAMMAR
 
 our $parser;
 
-=head2 SYNOPSIS
+=head1 NAME
+
+JavaScript::HashRef::Decode - a JavaScript "data hashref" decoder for Perl
+
+=head1 SYNOPSIS
 
     use JavaScript::HashRef::Decode qw<decode_js>;
     use Data::Dumper::Concise;
@@ -96,6 +100,8 @@ our $parser;
         },
         foo => "bar"
     }
+
+=head1 EXPORTED SUBROUTINES
 
 =head2 C<decode_js($str)>
 
@@ -123,7 +129,7 @@ sub decode_js {
 # For each "type", provide an ->out function which returns the proper Perl type
 # for the structure, possibly recursively
 
-=head2 CAVEATS & BUGS
+=head1 CAVEATS & BUGS
 
 =over
 
@@ -190,5 +196,21 @@ package JavaScript::HashRef::Decode::HASHREF;
 sub out {
     return { map {$_->out} @{ $_[ 0 ] } };
 }
+
+=back
+
+=head1 SEE ALSO
+
+L<Parse::RecDescent>
+
+=head1 AUTHOR
+
+Marco Fontani - L<MFONTANI@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2013 Situation Publishing LTD
+
+=cut
 
 1;
