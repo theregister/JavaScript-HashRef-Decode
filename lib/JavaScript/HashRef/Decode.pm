@@ -157,7 +157,8 @@ The L<Parse::RecDescent> internal interface is reused across invocations.
 sub decode_js {
     my ($str) = @_;
 
-    $parser //= Parse::RecDescent->new($js_grammar);
+    $parser = Parse::RecDescent->new($js_grammar)
+        if !defined $parser;
     my $parsed = $parser->hashref($str);
     return $parsed->out;
 }
