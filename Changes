@@ -1,3 +1,6 @@
+v.130160 - 2013-01-16
+    Fix test failure on 5.8.9 (defined-or)
+
 v.130142 - 2013-01-14
     Add support for true, false, null
     hashref keys can be single- and double- quoted strings
