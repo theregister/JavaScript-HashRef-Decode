@@ -246,7 +246,7 @@ sub out {
 
 L<Parse::RecDescent>
 
-The ECMAScript Object specification.
+The ECMAScript Object specification: L<http://www.ecmascript.org/>
 
 =head1 AUTHOR
 
