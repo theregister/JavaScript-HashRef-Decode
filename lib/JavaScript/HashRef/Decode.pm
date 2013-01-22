@@ -160,6 +160,8 @@ sub decode_js {
     $parser = Parse::RecDescent->new($js_grammar)
         if !defined $parser;
     my $parsed = $parser->hashref($str);
+    die "decode_js: Cannot parse (invalid js?) \"$str\""
+        if !defined $parsed;
     return $parsed->out;
 }
 
