@@ -190,12 +190,21 @@ C<\">, C<\'>, C<\n>, C<\t>.
 
 =cut
 
+my %unescape = (
+    'n' => "\n",
+    't' => "\t",
+    '"' => '"',
+    "'" => "'",
+);
+
+my $unescape_rx = do {
+    my $fixed = join '|', map quotemeta, reverse sort keys %unescape;
+    qr/\\($fixed)/;
+};
+
 sub out {
     my $val = $_[ 0 ]->{value};
-    $val =~ s/\\"/"/g;
-    $val =~ s/\\'/'/g;
-    $val =~ s/\\n/\n/g;
-    $val =~ s/\\t/\t/g;
+    $val =~ s/$unescape_rx/$unescape{$1}/g;
     return $val;
 }
 
