@@ -2,6 +2,7 @@ package JavaScript::HashRef::Decode;
 
 ## ABSTRACT: JavaScript "simple object" (hashref) decoder
 
+use v5.10;
 use strict;
 use warnings;
 use Parse::RecDescent;
@@ -18,12 +19,11 @@ number:     /[0-9]+(\.[0-9]+)?/
 string_double_quoted:
     m{"             # Starts with a single-quote
       (               # Start capturing *inside* the double-quote
-        (
-            \\.           # An escaped-something
-            |             # .. or
-            [^"]          # Anything that's not a double-quote
-        )*              # 0+ combination of the previous
-
+        [^\\"\r\n\x{2028}\x{2029}]*+     # Any ordinary characters
+        (?:                              # Followed by ...
+            \\ [^\r\n\x{2028}\x{2029}]     # Any backslash sequence
+            [^\\"\r\n\x{2028}\x{2029}]*+   # ... followed by any ordinary characters
+        )*+                              # 0+ times
       )               # End capturing *inside* the double-quote
     "               # Ends with a double-quote
     }x
@@ -35,12 +35,11 @@ string_double_quoted:
 string_single_quoted:
     m{'             # Starts with a single-quote
       (               # Start capturing *inside* the single-quote
-        (
-            \\.           # An escaped-something
-            |             # .. or
-            [^']          # Anything that's not a single-quote
-        )*              # 0+ combination of the previous
-
+        [^\\'\r\n\x{2028}\x{2029}]*+     # Any ordinary characters
+        (?:                              # Followed by ...
+            \\ [^\r\n\x{2028}\x{2029}]     # Any backslash sequence
+            [^\\'\r\n\x{2028}\x{2029}]*+   # ... followed by any ordinary characters
+        )*+                              # 0+ times
       )               # End capturing *inside* the single-quote
     '               # Ends with a single-quote
     }x
