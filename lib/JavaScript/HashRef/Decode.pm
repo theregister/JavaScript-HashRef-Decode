@@ -168,12 +168,6 @@ sub decode_js {
 # For each "type", provide an ->out function which returns the proper Perl type
 # for the structure, possibly recursively
 
-=head1 CAVEATS & BUGS
-
-=over
-
-=cut
-
 
 package JavaScript::HashRef::Decode::NUMBER;
 
@@ -182,13 +176,6 @@ sub out {
 }
 
 package JavaScript::HashRef::Decode::STRING;
-
-=item STRINGS
-
-JavaScript string interpolation only works for the following escaped values:
-C<\">, C<\'>, C<\n>, C<\t>.
-
-=cut
 
 my %unescape = (
     'b'  => "\b",
@@ -205,12 +192,12 @@ my %unescape = (
 
 my $unescape_rx = do {
     my $fixed = join '|', map quotemeta, grep $_, reverse sort keys %unescape;
-    qr/\\($fixed|0(?![0-9]))/;
+    qr/\\($fixed|0(?![0-9])|(x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4}))|.)/;
 };
 
 sub out {
     my $val = $_[ 0 ]->{value};
-    $val =~ s/$unescape_rx/$unescape{$1}/g;
+    $val =~ s/$unescape_rx/$unescape{$1} || ($2 ? chr(hex $+) : $1)/ge;
     return $val;
 }
 
@@ -254,8 +241,6 @@ package JavaScript::HashRef::Decode::HASHREF;
 sub out {
     return { map {$_->out} @{ $_[ 0 ] } };
 }
-
-=back
 
 =head1 SEE ALSO
 

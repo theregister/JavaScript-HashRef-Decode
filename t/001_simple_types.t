@@ -80,6 +80,16 @@ $res = $parser->string($str);
 $res = $res->out;
 is($res, qq/f\noo\0\b\f\r\x0B\\/, 'String with various escaped characters');
 
+$str = q!"\xa9\u263A"!;
+$res = $parser->string($str);
+$res = $res->out;
+is($res, "\x{a9}\x{263a}", 'String with \x and \u escapes');
+
+$str = q!"\&"!;
+$res = $parser->string($str);
+$res = $res->out;
+is($res, '&', 'String with unknown pass-through escape');
+
 $str = '123';
 $res = $parser->number($str);
 $res = $res->out;
