@@ -10,7 +10,14 @@ use Exporter qw<import>;
 our @EXPORT_OK = qw<decode_js>;
 
 our $js_grammar = <<'END_GRAMMAR';
-number:     /(?: (?: 0 | [1-9][0-9]* ) \. [0-9]*
+number:     hex | decimal
+hex:        / 0 [xX] [0-9a-fA-F]+ (?! \w ) /x
+{
+    $return = bless {
+        value => hex $item[1],
+    }, 'JavaScript::HashRef::Decode::NUMBER';
+}
+decimal:    /(?: (?: 0 | [1-9][0-9]* ) \. [0-9]*
                | \. [0-9]+
                | (?: 0 | [1-9][0-9]* ) )
              (?: [eE][-+]?[0-9]+ )?

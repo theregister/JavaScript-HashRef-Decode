@@ -120,6 +120,16 @@ $res = $parser->number($str);
 $res = $res->out;
 is($res, 5000, 'number: int, exp');
 
+$str = '0x1';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 1, 'number: int, exp');
+
+$str = '0Xdeadbeef';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 0xDEADBEEF, 'number: int, exp');
+
 $str = '[]';
 $res = $parser->arrayref($str);
 $res = $res->out;
