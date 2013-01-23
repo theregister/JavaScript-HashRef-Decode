@@ -100,6 +100,26 @@ $res = $parser->number($str);
 $res = $res->out;
 is($res, 123.45, 'float number');
 
+$str = '123.45e2';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 12345, 'number: int, frac, exp');
+
+$str = '123e2';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 12300, 'number: int, exp');
+
+$str = '.123e2';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 12.3, 'number: frac, exp');
+
+$str = '5e3';
+$res = $parser->number($str);
+$res = $res->out;
+is($res, 5000, 'number: int, exp');
+
 $str = '[]';
 $res = $parser->arrayref($str);
 $res = $res->out;

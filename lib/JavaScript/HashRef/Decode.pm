@@ -10,10 +10,14 @@ use Exporter qw<import>;
 our @EXPORT_OK = qw<decode_js>;
 
 our $js_grammar = <<'END_GRAMMAR';
-number:     /[0-9]+(\.[0-9]+)?/
+number:     /(?: (?: 0 | [1-9][0-9]* ) \. [0-9]*
+               | \. [0-9]+
+               | (?: 0 | [1-9][0-9]* ) )
+             (?: [eE][-+]?[0-9]+ )?
+             (?! \w )/x
 {
     $return = bless {
-        value => $item[1],
+        value => 0+$item[1],
     }, 'JavaScript::HashRef::Decode::NUMBER';
 }
 string_double_quoted:
