@@ -75,6 +75,11 @@ $res = $parser->string($str);
 $res = $res->out;
 is($res, "f\noo", 'String with escaped newline');
 
+$str = q!"f\noo\0\b\f\r\v\\\\"!;
+$res = $parser->string($str);
+$res = $res->out;
+is($res, qq/f\noo\0\b\f\r\x0B\\/, 'String with various escaped characters');
+
 $str = '123';
 $res = $parser->number($str);
 $res = $res->out;

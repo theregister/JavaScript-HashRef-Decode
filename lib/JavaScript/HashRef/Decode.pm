@@ -191,15 +191,21 @@ C<\">, C<\'>, C<\n>, C<\t>.
 =cut
 
 my %unescape = (
-    'n' => "\n",
-    't' => "\t",
-    '"' => '"',
-    "'" => "'",
+    'b'  => "\b",
+    'f'  => "\f",
+    'n'  => "\n",
+    'r'  => "\r",
+    't'  => "\t",
+    'v'  => "\x0B",
+    '"'  => '"',
+    "'"  => "'",
+    '0'  => "\0",
+    '\\' => '\\',
 );
 
 my $unescape_rx = do {
-    my $fixed = join '|', map quotemeta, reverse sort keys %unescape;
-    qr/\\($fixed)/;
+    my $fixed = join '|', map quotemeta, grep $_, reverse sort keys %unescape;
+    qr/\\($fixed|0(?![0-9]))/;
 };
 
 sub out {
