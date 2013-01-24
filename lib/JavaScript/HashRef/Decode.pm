@@ -265,6 +265,10 @@ The ECMAScript Object specification: L<http://www.ecmascript.org/>
 
 Marco Fontani - L<MFONTANI@cpan.org>
 
+=head1 CONTRIBUTORS
+
+Aaron Crane
+
 =head1 COPYRIGHT
 
 Copyright (c) 2013 Situation Publishing LTD
