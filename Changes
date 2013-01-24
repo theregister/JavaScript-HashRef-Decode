@@ -1,3 +1,9 @@
+v.130240 - 2013-01-24
+    Add improved backslash decoding and support all backslash sequences
+    Faster string parsing, support \u notation
+    Support more decimal and hex number syntaxes
+    Requires perl 5.10.0
+
 v.130220 - 2013-01-22
     Die properly on invalid input (#1 on github)
     Add link to ECMAScript spec
