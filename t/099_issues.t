@@ -12,5 +12,5 @@ $str = "{id:1,oops:,foo:'bar'}";
 $res = eval { decode_js($str) };
 $err = $@;
 ok($err,                    "Dies for invalid input");
-ok($err =~ /cannot parse/i, "User-friendly error message when unparsable");
-ok($err =~ /\Q$str/i,       "User-friendly error message contains input");
+like($err, qr/cannot parse/i, "User-friendly error message when unparsable");
+like($err, qr/\Q$str/i,       "User-friendly error message contains input");

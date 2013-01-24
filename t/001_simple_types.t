@@ -12,209 +12,62 @@ my $parser = do {
         or die "Parse::RecDescent: Bad JS grammar!\n";
 };
 
-my $str;
-my $res;
+sub parse_ok {
+    my ($type, $source, $expected, $desc) = @_;
+    my $value = $parser->$type($source);
+    like(ref($value), qr/\A JavaScript::HashRef::Decode::[A-Z]+ \z/xms,
+         "parsed: $desc")
+        and is_deeply($value->out, $expected, "result: $desc");
+}
 
-$str = 'undefined';
-$res = $parser->undefined($str);
-$res = $res->out;
-is($res, undef, 'Simple undefined');
+parse_ok(undefined => 'undefined', undef, 'simple undefined');
 
-$str = 'true';
-$res = $parser->true($str);
-$res = $res->out;
-is($res, !0, 'Simple true');
+parse_ok(true  => 'true',  !0, 'simple true');
+parse_ok(false => 'false', !1, 'simple false');
 
-$str = 'false';
-$res = $parser->false($str);
-$res = $res->out;
-is($res, !1, 'Simple false');
+parse_ok(string => '"foo"',    'foo',   'simple dquoted string');
+parse_ok(key    => 'foo',      'foo',   'simple unquoted key');
+parse_ok(key    => '"foo"',    'foo',   'simple dquoted key');
+parse_ok(key    => '"fo\"o"',  'fo"o',  'escaped dquoted key');
+parse_ok(key    => "'foo'",    'foo',   'simple squoted key');
+parse_ok(string => "'foo'",    'foo',   'simple squoted string');
+parse_ok(string => q!"f\"oo"!, 'f"oo',  'string with escaped double quote');
+parse_ok(string => q!"f\'oo"!, "f'oo",  'dquoted string with escaped squote');
+parse_ok(string => q!"f\noo"!, "f\noo", 'string with escaped newline');
 
-$str = '"foo"';
-$res = $parser->string($str);
-$res = $res->out;
-is($res, 'foo', 'Simple string');
+parse_ok(string => q!"f\noo\0\b\f\r\v\\\\"!, qq!f\noo\0\b\f\r\x0B\\!,
+         'string with various escaped characters');
+parse_ok(string => q!"\xa9\u263A"!, "\x{a9}\x{263a}",
+         'string with \x and \u escapes');
+parse_ok(string => q!"\u263a\ud804\uDC10\u263a"!, "\x{263a}\x{11010}\x{263a}",
+         'string with astral-plane \u escapes');
+parse_ok(string => q!"\&"!, '&', 'string with unknown pass-through escape');
 
-$str = 'foo';
-$res = $parser->key($str);
-$res = $res->out;
-is($res, 'foo', 'Simple key');
+parse_ok(number => '123',        123,        'simple number');
+parse_ok(number => '123.45',     123.45,     'float number');
+parse_ok(number => '123.45e2',   12345,      'number: int, frac, exp');
+parse_ok(number => '123e2',      12300,      'number: int, exp');
+parse_ok(number => '.123e2',     12.3,       'number: frac, exp');
+parse_ok(number => '5e3',        5000,       'number: int, exp');
+parse_ok(number => '0x1',        1,          'number: hex');
+parse_ok(number => '0Xdeadbeef', 0xDEADBEEF, 'number: heX');
 
-$str = '"foo"';
-$res = $parser->key($str);
-$res = $res->out;
-is($res, 'foo', 'Simple key');
+parse_ok(arrayref => '[]',          [],          'empty arrayref');
+parse_ok(arrayref => '[1,2,3]',     [1,2,3],     'simple arrayref');
+parse_ok(arrayref => '[1,"foo",3]', [1,'foo',3], 'mixed num/dquote arrayref');
+parse_ok(arrayref => "[1,'foo',3]", [1,'foo',3], 'mixed num/squote arrayref');
 
-$str = '"fo\"o"';
-$res = $parser->key($str);
-$res = $res->out;
-is($res, 'fo"o', 'Escaped key');
+parse_ok(arrayref => '[1,{foo:"bar",bar:6.66},3]',
+         [1, { foo => 'bar', bar => 6.66 }, 3],
+         'mixed num/object/dquote arrayref');
 
-$str = "'foo'";
-$res = $parser->key($str);
-$res = $res->out;
-is($res, 'foo', 'Simple key');
+parse_ok(arrayref => "[1,{foo:'bar',bar:6.66},3]",
+         [1, { foo => 'bar', bar => 6.66 }, 3],
+         'mixed num/object/squote arrayref');
 
-$str = "'foo'";
-$res = $parser->string($str);
-$res = $res->out;
-is($res, 'foo', 'Simple string');
-
-$str = q!"f\"oo"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, 'f"oo', 'String with escaped double quote');
-
-$str = q!"f\'oo"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, "f'oo", 'String with escaped single quote');
-
-$str = q!"f\noo"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, "f\noo", 'String with escaped newline');
-
-$str = q!"f\noo\0\b\f\r\v\\\\"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, qq/f\noo\0\b\f\r\x0B\\/, 'String with various escaped characters');
-
-$str = q!"\xa9\u263A"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, "\x{a9}\x{263a}", 'String with \x and \u escapes');
-
-$str = q!"\u263a\ud804\uDC10\u263a"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, "\x{263a}\x{11010}\x{263a}", 'String with astral-plane \u escapes');
-
-$str = q!"\&"!;
-$res = $parser->string($str);
-$res = $res->out;
-is($res, '&', 'String with unknown pass-through escape');
-
-$str = '123';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 123, 'simple number');
-
-$str = '123.45';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 123.45, 'float number');
-
-$str = '123.45e2';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 12345, 'number: int, frac, exp');
-
-$str = '123e2';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 12300, 'number: int, exp');
-
-$str = '.123e2';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 12.3, 'number: frac, exp');
-
-$str = '5e3';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 5000, 'number: int, exp');
-
-$str = '0x1';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 1, 'number: int, exp');
-
-$str = '0Xdeadbeef';
-$res = $parser->number($str);
-$res = $res->out;
-is($res, 0xDEADBEEF, 'number: int, exp');
-
-$str = '[]';
-$res = $parser->arrayref($str);
-$res = $res->out;
-is(ref $res, 'ARRAY', 'empty arrayref');
-is(scalar @$res, 0);
-
-$str = '[1,2,3]';
-$res = $parser->arrayref($str);
-$res = $res->out;
-is(ref $res, 'ARRAY', 'simple arrayref');
-is(scalar @$res, 3);
-is($res->[ 0 ],  1);
-is($res->[ 1 ],  2);
-is($res->[ 2 ],  3);
-
-$str = '[1,"foo",3]';
-$res = $parser->arrayref($str);
-$res = $res->out;
-is($res->[ 0 ], 1);
-is($res->[ 1 ], "foo");
-is($res->[ 2 ], 3);
-
-$str = "[1,'foo',3]";
-$res = $parser->arrayref($str);
-$res = $res->out;
-is($res->[ 0 ], 1);
-is($res->[ 1 ], "foo");
-is($res->[ 2 ], 3);
-
-$str = '[1,{foo:"bar",bar:6.66},3]';
-$res = $parser->arrayref($str);
-$res = $res->out;
-is(ref $res, 'ARRAY', 'complex arrayref');
-is($res->[ 0 ],     1);
-is(ref $res->[ 1 ], 'HASH');
-ok(exists $res->[ 1 ]{foo});
-ok(exists $res->[ 1 ]{bar});
-is($res->[ 1 ]{foo}, 'bar');
-is($res->[ 1 ]{bar}, 6.66);
-is($res->[ 2 ],      3);
-
-$str = "[1,{foo:'bar',bar:6.66},3]";
-$res = $parser->arrayref($str);
-$res = $res->out;
-is(ref $res, 'ARRAY', 'complex arrayref');
-is($res->[ 0 ],     1);
-is(ref $res->[ 1 ], 'HASH');
-ok(exists $res->[ 1 ]{foo});
-ok(exists $res->[ 1 ]{bar});
-is($res->[ 1 ]{foo}, 'bar');
-is($res->[ 1 ]{bar}, 6.66);
-is($res->[ 2 ],      3);
-
-$str = '{}';
-$res = $parser->hashref($str);
-$res = $res->out;
-is(ref $res, 'HASH', 'empty hashref');
-is(scalar keys %$res, 0);
-
-$str = '{k:"v",y:undefined}';
-$res = $parser->hashref($str);
-$res = $res->out;
-is(ref $res, 'HASH', 'simple hashref');
-is((sort keys %$res)[ 0 ], 'k');
-is((sort keys %$res)[ 1 ], 'y');
-is($res->{k},              'v');
-is($res->{y},              undef);
-
-$str = '{k:[1,undefined,3],y:{k:"v",y:false}}';
-$res = $parser->hashref($str);
-$res = $res->out;
-is(ref $res, 'HASH', 'complex hashref');
-is((sort keys %$res)[ 0 ], 'k');
-is((sort keys %$res)[ 1 ], 'y');
-is(ref $res->{k},          'ARRAY');
-is($res->{k}[ 0 ],         1);
-is($res->{k}[ 1 ],         undef);
-is($res->{k}[ 2 ],         3);
-is(ref $res->{y},          'HASH');
-ok(exists $res->{y}{k});
-ok(exists $res->{y}{y});
-is($res->{y}{k}, 'v');
-is($res->{y}{y}, !(1==1));
+parse_ok(hashref => '{}', {}, 'empty hashref');
+parse_ok(hashref => '{k:"v",y:undefined}', { k => 'v', y => undef },
+         'simple hashref');
+parse_ok(hashref => '{k:[1,undefined,3],y:{k:"v",y:false}}',
+         { k => [1, undef, 3], y => { k => 'v', y => !1 } },
+         'complex hashref');
