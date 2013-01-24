@@ -24,12 +24,6 @@ Examples
         foo => "bar"
     }
 
-
-To do
------
-
-String de-interpolation is not the best it could be.
-
 Copyright
 ---------
 
