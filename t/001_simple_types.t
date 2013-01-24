@@ -85,6 +85,11 @@ $res = $parser->string($str);
 $res = $res->out;
 is($res, "\x{a9}\x{263a}", 'String with \x and \u escapes');
 
+$str = q!"\u263a\ud804\uDC10\u263a"!;
+$res = $parser->string($str);
+$res = $res->out;
+is($res, "\x{263a}\x{11010}\x{263a}", 'String with astral-plane \u escapes');
+
 $str = q!"\&"!;
 $res = $parser->string($str);
 $res = $res->out;

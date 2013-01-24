@@ -207,6 +207,9 @@ my $unescape_rx = do {
 
 sub out {
     my $val = $_[ 0 ]->{value};
+    $val =~ s{\\u[dD]([89abAB][0-9a-fA-F][0-9a-fA-F])
+              \\u[dD]([c-fC-F][0-9a-fA-F][0-9a-fA-F])}
+             { chr(0x10000 + ((hex($1) - 0x800 << 10) | hex($2) - 0xC00)) }xmsge;
     $val =~ s/$unescape_rx/$unescape{$1} || ($2 ? chr(hex $+) : $1)/ge;
     return $val;
 }
