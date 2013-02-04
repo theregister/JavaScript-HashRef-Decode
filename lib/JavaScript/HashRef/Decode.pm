@@ -14,7 +14,7 @@ number:     hex | decimal
 hex:        / 0 [xX] [0-9a-fA-F]+ (?! \w ) /x
 {
     $return = bless {
-        value => hex $item[1],
+        value => hex lc $item[1],
     }, 'JavaScript::HashRef::Decode::NUMBER';
 }
 decimal:    /(?: (?: 0 | [1-9][0-9]* ) \. [0-9]*
