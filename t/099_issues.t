@@ -14,3 +14,8 @@ $err = $@;
 ok($err,                    "Dies for invalid input");
 like($err, qr/cannot parse/i, "User-friendly error message when unparsable");
 like($err, qr/\Q$str/i,       "User-friendly error message contains input");
+
+$str = '{ "foo" : -1 }';
+$res = eval { decode_js($str) };
+$err = $@;
+ok(!$err, "can parse negative decimals");
