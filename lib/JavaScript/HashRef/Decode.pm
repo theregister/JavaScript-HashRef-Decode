@@ -59,7 +59,7 @@ string_single_quoted:
         value => "$1",
     }, 'JavaScript::HashRef::Decode::STRING';
 }
-unescaped_key:        m{[a-zA-Z_][a-zA-Z_0-9]*}
+unescaped_key:        m{[a-zA-Z_0-9]+}
 {
     $return = bless {
         key => $item[1],

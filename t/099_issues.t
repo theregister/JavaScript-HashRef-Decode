@@ -19,3 +19,8 @@ $str = '{ "foo" : -1 }';
 $res = eval { decode_js($str) };
 $err = $@;
 ok(!$err, "can parse negative decimals");
+
+$str = '{ 1234: 2 }';
+$res = eval { decode_js($str) };
+$err = $@;
+ok(!$err, "can parse keys made of numbers");
