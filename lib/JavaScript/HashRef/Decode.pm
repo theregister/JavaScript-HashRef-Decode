@@ -117,8 +117,8 @@ JavaScript::HashRef::Decode - a JavaScript "data hashref" decoder for Perl
 
 =head1 DESCRIPTION
 
-This module "decodes" a simple data-only JavaScript "object" and returns a
-Perl hashref constructed from the data contained in it.
+This module "decodes" a simple data-only JavaScript "variable value" and
+returns a Perl data structure constructed from the data contained in it.
 
 It only supports "data" which comprises of: hashrefs, arrayrefs, single- and
 double-quoted strings, numbers, and "special" token the likes of "undefined",
@@ -151,8 +151,9 @@ Patches are always welcome.
 
 =head2 C<decode_js($str)>
 
-Given a JavaScript object thing (i.e. an hashref), returns a Perl hashref
-structure which corresponds to the given data
+Given a JavaScript "variable value" thing (i.e. an hashref or arrayref or
+string, number, etc), returns a Perl hashref structure which corresponds to the
+given data
 
   decode_js('{foo:"bar"}');
 
@@ -169,7 +170,7 @@ sub decode_js {
 
     $parser = Parse::RecDescent->new($js_grammar)
         if !defined $parser;
-    my $parsed = $parser->hashref($str);
+    my $parsed = $parser->any_value($str);
     die "decode_js: Cannot parse (invalid js?) \"$str\""
         if !defined $parsed;
     return $parsed->out;

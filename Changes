@@ -1,5 +1,8 @@
 Revision history for Perl module JavaScript::HashRef::Decode
 
+0.221231 2022-05-03
+    - fix: allow any top-level value
+
 0.221230 2022-05-03
     - fix: hash keys can be whole numbers
 
